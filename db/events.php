@@ -16,6 +16,7 @@
 
 /**
  * @package    local_metasync
+ * @copyright  2014 Willy Lee (wlee@carleton.edu)
  * @copyright  2014 Paul Holden (pholden@greenhead.ac.uk)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

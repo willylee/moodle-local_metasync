@@ -1,6 +1,10 @@
 Moodle Meta-course Group Synchronization
 =========================================
 
+Metasync creates and maintains groups in metacourses that reflect the enrollment of the linked courses.
+
+Metasync is based on local_metagroup by Paul Holden https://github.com/paulholden/moodle-local_metagroups
+
 Requirements
 ------------
 - Moodle 2.6 (build 2013111800 or later)
@@ -15,22 +19,16 @@ Usage
 After installation you may need to synchronize existing meta-course groups, to do this run the cli/sync.php script (use the --help
 switch for further instructions on script usage).
 
-Any future amendments to groups in 'child' courses will be reflected in 'parent' courses that use groups.
+Any future amendments to enrollments in 'child' courses will be reflected in 'parent' course groups.
 
 Author
 ------
-Paul Holden (pholden@greenhead.ac.uk)
+Willy Lee (wlee@carleton.edu)
 
-- Updates: https://moodle.org/plugins/view.php?plugin=local_metasync
-- Latest code: https://github.com/paulholden/moodle-local_metasync
+Based on local_metagroups by
+Paul Holden (pholden@greenhead.ac.uk)
 
 Changes
 -------
-Release 1.2 (build 2014080500)
-- Only synchronize parent courses that use groups.
-
-Release 1.1 (build 2014031300)
-- Prevent synchronized group memberships being removed.
-
-Release 1.0 (build 2014021001)
+Release 1.0 (build 2014)
 - First release.
