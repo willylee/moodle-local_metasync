@@ -34,4 +34,9 @@ $observers = array(
         'eventname' => '\core\event\user_enrolment_deleted',
         'callback'  => '\local_metasync\observers::user_enrolment_deleted',
     ),
+
+    array(
+        'eventname' => '\core\event\user_enrolment_updated',
+        'callback'  => '\local_metasync\observers::user_enrolment_updated',
+    ),
 );
