@@ -63,7 +63,7 @@ class observers {
                 // If event user is enrolled in this child course, add to this group.
                 $coursecontext = \context_course::instance($child->id);
                 $user = \core_user::get_user($event->relateduserid);
-                if (\is_enrolled($coursecontext, $user)) {
+                if (\is_enrolled($coursecontext, $user, '', true)) {
                    $newgroup = $DB->get_record('groups', array('courseid' => $event->courseid, 'idnumber' => $child->id));
                    \groups_add_member($newgroup, $event->relateduserid, 'local_metasync', $child->id);
                 }
@@ -110,6 +110,41 @@ class observers {
 
             if ($metagroup = $DB->get_record('groups', array('courseid' => $course->id, 'idnumber' => $event->courseid))) {
                 groups_remove_member($metagroup, $userid);
+            }
+        }
+    }
+
+    /**
+     * Enrolment updated
+     *
+     * @param \core\event\user_enrolment_updated $event
+     * @return void
+     */
+    public static function user_enrolment_updated(\core\event\user_enrolment_updated $event) {
+        global $DB;
+
+        if (!enrol_is_enabled('meta')) {
+            // No more enrolments for disabled plugins.
+            return true;
+        }
+
+        if ($event->other['enrol'] === 'meta') {
+            // Prevent circular dependencies - we can not sync meta enrolments recursively.
+            return true;
+        }
+
+        $parentcourseids = local_metasync_parent_courses($event->courseid);
+
+        $user = \core_user::get_user($event->relateduserid);
+
+        foreach ($parentcourseids as $courseid) {
+            $coursecontext = \context_course::instance($event->courseid);
+            if (\is_enrolled($coursecontext, $user, '', true)) {
+               $newgroup = $DB->get_record('groups', array('courseid' => $courseid, 'idnumber' => $event->courseid));
+               \groups_add_member($newgroup, $event->relateduserid, 'local_metasync', $courseid);
+            } else {
+               $newgroup = $DB->get_record('groups', array('courseid' => $courseid, 'idnumber' => $event->courseid));
+               \groups_remove_member($newgroup, $event->relateduserid);
             }
         }
     }

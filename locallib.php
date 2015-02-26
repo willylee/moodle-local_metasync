@@ -86,10 +86,29 @@ function local_metasync_sync(progress_trace $trace) {
 
             $trace->output($metagroup->name, 3);
             $coursecontext = context_course::instance($childid);
-            $users = get_enrolled_users($coursecontext);
-            foreach ($users as $user) {
+            $allusers = get_enrolled_users($coursecontext);
+            $activeusers = get_enrolled_users($coursecontext, '', 0, 'u.*', null, 0, 0, true);
+            $suspendedusers = array_udiff($allusers, $activeusers, 'local_metasync_compare_user_objects');
+            // We need to add active users to appropriate groups.
+            foreach ($activeusers as $user) {
                 groups_add_member($metagroup, $user->id, 'local_metasync', $courseid);
+            }
+            // We may need to remove suspended users from child course groups, but only if added by local_metasync.
+            foreach ($suspendedusers as $user) {
+                if ($metamember = $DB->get_record('groups_members', array('groupid' => $metagroup->id, 'userid' => $user->id, 'component' => 'local_metasync'))) {
+                    groups_remove_member($metagroup, $user->id);
+                }
             }
         }
     }
+}
+
+/**
+ * Compare user objects
+ *
+ * @param object $obj1
+ * @param object $obj2
+ */
+function local_metasync_compare_user_objects($obj1, $obj2) {
+    return $obj1->id - $obj2->id;
 }
